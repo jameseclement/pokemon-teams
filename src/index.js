@@ -27,6 +27,9 @@ let main = document.querySelector("#main")
 
 
   let pokemons = trainer.pokemons
+  // I need to figure out how to make the function
+  // called here accessable when adding a new
+  // pokemon
   pokemons.forEach((pokemon) => {
 
       let pokeLi = document.createElement('li')
