@@ -52,6 +52,7 @@ let main = document.querySelector("#main")
 
 //function to handle click of addPokemonButton
 function addPokemon(e){
+if (e.target.nextElementSibling.childElementCount < 6){
 trainerId = e.target.id
 data = {trainer_id : `${trainerId}`}
 
@@ -65,6 +66,9 @@ data = {trainer_id : `${trainerId}`}
   })
   .then(res => res.json())
   .then(pokemon => renderPokemon(pokemon))
+}else{
+  alert("You cannot have more than six pokemon on your team.")
+}
 }
 
 //this is only used when you are adding a new pokemon
