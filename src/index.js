@@ -35,6 +35,10 @@ let main = document.querySelector("#main")
       let releaseButton = document.createElement("button")
           releaseButton.innerText = "Release"
           releaseButton.classList.add("release")
+          releaseButton.id = `poke ${pokemon.id}`
+
+          releaseButton.addEventListener("click", releasePokemon)
+
           pokeUl.appendChild(pokeLi)
           pokeLi.appendChild(releaseButton)
         })
@@ -42,6 +46,9 @@ let main = document.querySelector("#main")
   main.appendChild(trainerCard)
 
 }
+
+
+
 
 //function to handle click of addPokemonButton
 function addPokemon(e){
@@ -57,17 +64,33 @@ data = {trainer_id : `${trainerId}`}
     body: JSON.stringify(data)
   })
   .then(res => res.json())
-  .then(json => renderPokemon(json)))
-
-
+  .then(pokemon => renderPokemon(pokemon))
 }
 
+//this is only used when you are adding a new pokemon
+//(need to figure out method for not having to repeat this here)
+//---------------------------------------------
+ function renderPokemon(pokemon){
+   let targetUl = document.getElementById(`${pokemon.trainer_id}`).nextSibling
+   let pokeLi = document.createElement('li')
 
+      pokeLi.innerHTML = `${pokemon.nickname} (${pokemon.species})`
+   let releaseButton = document.createElement("button")
+       releaseButton.innerText = "Release"
+       releaseButton.classList.add("release")
+       releaseButton.id = `poke ${pokemon.id}`
+       releaseButton.addEventListener("click", releasePokemon)
+       targetUl.appendChild(pokeLi)
+       pokeLi.appendChild(releaseButton)
+     }
+//-----------------------------------------------
 
-
-
-
-
+function releasePokemon(e){
+  e.target.parentElement.remove()
+  fetch(`http://localhost:3000/pokemons/${e.target.id.split(' ')[1]}`,{
+    method : 'DELETE'
+  })
+}
 
 
 
