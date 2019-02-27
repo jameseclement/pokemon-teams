@@ -1,1 +1,76 @@
 //solution goes here
+document.addEventListener("DOMContentLoaded", () =>{
+//invoke fetching of trainers
+fetchTrainers()
+
+//declaring function to fetch trainers
+function fetchTrainers(){
+  fetch("http://localhost:3000/trainers")
+  .then(res => res.json())
+  .then(json => json.forEach(function(trainer){renderTrainer(trainer)}))
+}
+
+//declare function to render one trainer
+function renderTrainer(trainer){
+let main = document.querySelector("#main")
+  let trainerCard = document.createElement("div")
+  trainerCard.classList.add('card')
+  let trainerName = document.createElement("p")
+  trainerName = trainer.name
+  let addPokemonButton = document.createElement("button")
+  addPokemonButton.id = trainer.id
+  addPokemonButton.innerHTML = "Add Pokemon"
+  //add addEventListener to add Pokemon button
+  addPokemonButton.addEventListener('click', addPokemon)
+
+  let pokeUl = document.createElement('ul')
+
+
+  let pokemons = trainer.pokemons
+  pokemons.forEach((pokemon) => {
+
+      let pokeLi = document.createElement('li')
+
+         pokeLi.innerHTML = `${pokemon.nickname} (${pokemon.species})`
+      let releaseButton = document.createElement("button")
+          releaseButton.innerText = "Release"
+          releaseButton.classList.add("release")
+          pokeUl.appendChild(pokeLi)
+          pokeLi.appendChild(releaseButton)
+        })
+  trainerCard.append(trainerName, addPokemonButton, pokeUl)
+  main.appendChild(trainerCard)
+
+}
+
+//function to handle click of addPokemonButton
+function addPokemon(e){
+trainerId = e.target.id
+data = {trainer_id : `${trainerId}`}
+
+  fetch('http://localhost:3000/pokemons',{
+    method: "POST",
+    headers:
+    {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(json => renderPokemon(json)))
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+})
