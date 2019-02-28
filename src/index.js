@@ -1,106 +1,62 @@
-//solution goes here
-document.addEventListener("DOMContentLoaded", () =>{
-//invoke fetching of trainers
-fetchTrainers()
+document.addEventListener("DOMContentLoaded", ()=>{
+  fetchTrainers()
+})
 
-//declaring function to fetch trainers
 function fetchTrainers(){
-  fetch("http://localhost:3000/trainers")
+  fetch('http://localhost:3000/trainers')
   .then(res => res.json())
-  .then(json => json.forEach(function(trainer){renderTrainer(trainer)}))
+  .then(json => json.forEach(trainer => renderTrainer(trainer)))
 }
 
-//declare function to render one trainer
 function renderTrainer(trainer){
-let main = document.querySelector("#main")
+  let main = document.querySelector("#main")
   let trainerCard = document.createElement("div")
-  trainerCard.classList.add('card')
-  let trainerName = document.createElement("p")
-  trainerName = trainer.name
-  let addPokemonButton = document.createElement("button")
-  addPokemonButton.id = trainer.id
-  addPokemonButton.innerHTML = "Add Pokemon"
-  //add addEventListener to add Pokemon button
-  addPokemonButton.addEventListener('click', addPokemon)
-
-  let pokeUl = document.createElement('ul')
-
-
-  let pokemons = trainer.pokemons
-  // I need to figure out how to make the function
-  // called here accessable when adding a new
-  // pokemon
-  pokemons.forEach((pokemon) => {
-
-      let pokeLi = document.createElement('li')
-
-         pokeLi.innerHTML = `${pokemon.nickname} (${pokemon.species})`
-      let releaseButton = document.createElement("button")
-          releaseButton.innerText = "Release"
-          releaseButton.classList.add("release")
-          releaseButton.id = `poke ${pokemon.id}`
-
-          releaseButton.addEventListener("click", releasePokemon)
-
-          pokeUl.appendChild(pokeLi)
-          pokeLi.appendChild(releaseButton)
-        })
-  trainerCard.append(trainerName, addPokemonButton, pokeUl)
-  main.appendChild(trainerCard)
-
+    trainerCard.classList.add("card")
+    let trainerP = document.createElement("p")
+      trainerP.innerHTML = trainer.name
+      let ul = document.createElement("ul")
+    let addButton = document.createElement("button")
+      addButton.innerHTML = "Add Pokemon"
+      addButton.addEventListener("click", (e) => addPokemon(e, trainer, ul))
+    trainer.pokemons.forEach(pokemon => renderPokemon(trainer, ul, pokemon))
+    trainerCard.append(trainerP, addButton, ul)
+    main.appendChild(trainerCard)
 }
 
+function renderPokemon (trainer, ul, pokemon){
+  let li = document.createElement("li")
+  li.innerHTML = `${pokemon.nickname} (${pokemon.species})`
+  let button = document.createElement("button")
+  button.classList.add("release")
+  button.innerHTML = "Release"
+  button.addEventListener("click", (e) => releasePokemon(e, pokemon, li))
+  li.appendChild(button)
+  ul.appendChild(li)
+}
 
-
-
-//function to handle click of addPokemonButton
-function addPokemon(e){
-if (e.target.nextElementSibling.childElementCount < 6){
-trainerId = e.target.id
-data = {trainer_id : `${trainerId}`}
-
-  fetch('http://localhost:3000/pokemons',{
+function addPokemon(e, trainer, ul){
+  
+  if(ul.childElementCount < 6)
+  {
+  let data = {trainer_id: trainer.id}
+  fetch(`http://localhost:3000/pokemons`, {
     method: "POST",
-    headers:
-    {
-      'Content-Type': 'application/json'
+    headers: {
+      "Content-Type": "application/json"
     },
     body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(json => renderPokemon(trainer, ul, json))
+  }
+  else{
+    alert("You cant have more than 6 pokes")
+  }
+}
+
+function releasePokemon(e, pokemon, li){
+  fetch(`http://localhost:3000/pokemons/${pokemon.id}`,{
+    method: "DELETE"
   })
-  .then(res => res.json())
-  .then(pokemon => renderPokemon(pokemon))
-}else{
-  alert("You cannot have more than six pokemon on your team.")
+  .then(li.remove())
 }
-}
-
-//this is only used when you are adding a new pokemon
-//(need to figure out method for not having to repeat this here)
-//---------------------------------------------
- function renderPokemon(pokemon){
-   let targetUl = document.getElementById(`${pokemon.trainer_id}`).nextSibling
-   let pokeLi = document.createElement('li')
-
-      pokeLi.innerHTML = `${pokemon.nickname} (${pokemon.species})`
-   let releaseButton = document.createElement("button")
-       releaseButton.innerText = "Release"
-       releaseButton.classList.add("release")
-       releaseButton.id = `poke ${pokemon.id}`
-       releaseButton.addEventListener("click", releasePokemon)
-       targetUl.appendChild(pokeLi)
-       pokeLi.appendChild(releaseButton)
-     }
-//-----------------------------------------------
-
-function releasePokemon(e){
-  e.target.parentElement.remove()
-  fetch(`http://localhost:3000/pokemons/${e.target.id.split(' ')[1]}`,{
-    method : 'DELETE'
-  })
-}
-
-
-
-
-
-})
